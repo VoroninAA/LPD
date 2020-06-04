@@ -48,6 +48,124 @@ def FCFS(thread_list):
         cpu += 1
     return result
 
+def StandartPriotiry(thread_list):
+    result = [[] for t in thread_list]
+    # list that show state of process (active or finished)
+    finished_threads = [False for t in thread_list]
+    # queue of current process
+    queue = [thread_list.index(t) for t in thread_list]
+    # list of current indexes of process
+    current_indexes = [0 for t in thread_list]
+
+    print(current_indexes)
+    cpu = 0
+    while not all(finished_threads):
+        if queue:
+            current_thread_number = min(queue)
+            queue.pop(queue.index(current_thread_number))
+            print(current_thread_number)
+            while (not finished_threads[current_thread_number]) and (
+                    thread_list[current_thread_number][current_indexes[current_thread_number]] == 1):
+                for i in range(len(result)):
+                    if not finished_threads[i]:
+                        if i == current_thread_number:
+                            result[i].append('x')
+                            current_indexes[i] += 1
+                        else:
+                            if thread_list[i][current_indexes[i]] == 1:
+                                result[i].append('.')
+                            else:
+                                result[i].append('-')
+                                current_indexes[i] += 1
+                        if current_indexes[i] >= len(thread_list[i]):
+                            finished_threads[i] = True
+            print(result)
+        else:
+            for i in range(len(result)):
+                if not finished_threads[i]:
+                    if thread_list[i][current_indexes[i]] == 1:
+                        result[i].append('.')
+                    else:
+                        result[i].append('-')
+                        current_indexes[i] += 1
+                    if current_indexes[i] >= len(thread_list[i]):
+                        finished_threads[i] = True
+
+        for i in range(len(thread_list)):
+            if not finished_threads[i]:
+                if thread_list[i][current_indexes[i]] == 1 and not i in queue:
+                    queue.append(i)
+        print(queue)
+        cpu += 1
+    return result
+
+
+def RR(thread_list, quantum):
+    result = [[] for t in thread_list]
+    # list that show state of process (active or finished)
+    finished_threads = [False for t in thread_list]
+    # queue of current process
+    queue = [thread_list.index(t) for t in thread_list]
+    # list of current indexes of process
+    current_indexes = [0 for t in thread_list]
+
+    print(current_indexes)
+    cpu = 0
+    prev_thread_number=-1
+    while not all(finished_threads):
+        if queue:
+            if current_indexes[prev_thread_number]<len(thread_list[prev_thread_number]):
+              if thread_list[prev_thread_number][current_indexes[prev_thread_number]] == 1 and prev_thread_number!=-1:
+                    queue.pop(queue.index((prev_thread_number)))
+                    queue.append(prev_thread_number)
+
+
+            for q in queue:
+                if q!=prev_thread_number:
+                    current_thread_number=q
+                    queue.pop(queue.index(q))
+                    break
+
+
+            prev_thread_number=current_thread_number
+            print(current_thread_number)
+            step=0
+            while (not finished_threads[current_thread_number]) and (step<quantum) and  (thread_list[current_thread_number][current_indexes[current_thread_number]] == 1):
+                step+=1
+                for i in range(len(result)):
+                    if not finished_threads[i]:
+                        if i == current_thread_number:
+                            result[i].append('x')
+                            current_indexes[i] += 1
+                        else:
+                            if thread_list[i][current_indexes[i]] == 1:
+                                result[i].append('.')
+                            else:
+                                result[i].append('-')
+                                current_indexes[i] += 1
+                        if current_indexes[i] >= len(thread_list[i]):
+                            finished_threads[i] = True
+            print(result)
+        else:
+            for i in range(len(result)):
+                if not finished_threads[i]:
+                    if thread_list[i][current_indexes[i]] == 1:
+                        result[i].append('.')
+                    else:
+                        result[i].append('-')
+                        current_indexes[i] += 1
+                    if current_indexes[i] >= len(thread_list[i]):
+                        finished_threads[i] = True
+
+        for i in range(len(thread_list)):
+            if not finished_threads[i]:
+                if thread_list[i][current_indexes[i]] == 1 and not i in queue:
+                    queue.append(i)
+        print(queue)
+        cpu += 1
+    return result
+
+
 
 
 def calculate_stats(result):
@@ -57,9 +175,10 @@ def calculate_stats(result):
     finished_threads = [False for l in result]
 
     for l in result:
+        sum_len += len(l)
         if len(l)>max_len:
             max_len=len(l)
-            sum_len+=len(l)
+
 
     stats.append('Throughput=' + str(len(result))+ "/" + str(max_len))
     stats.append("Turnaround time="+str(sum_len)+ "/" + str(len(result)))
