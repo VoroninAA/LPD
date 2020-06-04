@@ -14,4 +14,7 @@ with open('./input_file.txt') as input_file:
 
 import sheduling_algorithms
 result = sheduling_algorithms.FCFS(threads_list)
+stats=sheduling_algorithms.calculate_stats(result)
+print(stats)
+
 sheduling_algorithms.visualise(result)

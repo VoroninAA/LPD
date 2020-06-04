@@ -49,6 +49,89 @@ def FCFS(thread_list):
     return result
 
 
+
+def calculate_stats(result):
+    max_len = 0
+    sum_len=0
+    stats=[]
+    finished_threads = [False for l in result]
+
+    for l in result:
+        if len(l)>max_len:
+            max_len=len(l)
+            sum_len+=len(l)
+
+    stats.append('Throughput=' + str(len(result))+ "/" + str(max_len))
+    stats.append("Turnaround time="+str(sum_len)+ "/" + str(len(result)))
+
+
+
+    eff_loss=0;
+    count_not_busy=0
+    count_working_threads=0
+    for i in range(0,max_len):
+        for k in range(0,len(result)):
+            if  finished_threads[k]==False:
+                count_working_threads+=1
+                if result[k][i]!='x':
+                    count_not_busy+=1
+
+        if count_working_threads==count_not_busy:
+            eff_loss+=1
+        count_not_busy = 0
+        count_working_threads = 0
+        for j in range(0,len(result)):
+            if i==len(result[j])-1:
+                finished_threads[j]=True
+
+
+    stats.append("Efficiency=" + str(max_len-eff_loss) + "/" + str(max_len))
+    io_count=0
+    wait_count=0
+
+    for l in result:
+        tag = False
+        for i in range(1,len(l)):
+            if l[i-1]=='x' and l[i]=='-':
+                io_count+=1
+
+
+            if l[i-1]=='-' and l[i]=='.':
+                tag=True
+                wait_count+=1
+            if l[i-1]=='.' and l[i]=='.' and tag:
+                wait_count+=1
+    stats.append("Waittime=" + str(wait_count) + "/" + str(io_count))
+    task_switches=0
+
+
+    prev_thread=0
+    for k in range(0,len(result)):
+        if result[k][0]=='x':
+            prev_thread=k
+
+    finished_threads = [False for t in result]
+    for i in range(0,max_len):
+        for k in range(0,len(result)):
+            if  finished_threads[k]==False:
+                if result[k][i]=='x':
+                    if prev_thread!=k:
+                        task_switches+=1
+                        prev_thread=k
+
+
+
+        for j in range(0,len(result)):
+            if i==len(result[j])-1:
+                finished_threads[j]=True
+
+    stats.append("Task switches="+str(task_switches))
+
+
+    return stats
+
+
+
 import xlwt
 
 
