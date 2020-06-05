@@ -12,7 +12,7 @@ def FCFS(thread_list):
     while not all(finished_threads):
         if queue:
             current_thread_number = queue.pop(0)
-            print(current_thread_number)
+            # print(current_thread_number)
             while (not finished_threads[current_thread_number]) and (
                     thread_list[current_thread_number][current_indexes[current_thread_number]] == 1):
                 for i in range(len(result)):
@@ -28,7 +28,11 @@ def FCFS(thread_list):
                                 current_indexes[i] += 1
                         if current_indexes[i] >= len(thread_list[i]):
                             finished_threads[i] = True
-            print(result)
+                for i in range(len(thread_list)):
+                    if not finished_threads[i] and i != current_thread_number:
+                        if thread_list[i][current_indexes[i]] == 1 and not i in queue:
+                            queue.append(i)
+            # print(result)
         else:
             for i in range(len(result)):
                 if not finished_threads[i]:
@@ -39,11 +43,10 @@ def FCFS(thread_list):
                         current_indexes[i] += 1
                     if current_indexes[i] >= len(thread_list[i]):
                         finished_threads[i] = True
-
-        for i in range(len(thread_list)):
-            if not finished_threads[i]:
-                if thread_list[i][current_indexes[i]] == 1 and not i in queue:
-                    queue.append(i)
+            for i in range(len(thread_list)):
+                if not finished_threads[i]:
+                    if thread_list[i][current_indexes[i]] == 1 and not i in queue:
+                        queue.append(i)
         print(queue)
         cpu += 1
     return result
@@ -170,18 +173,20 @@ def RR(thread_list, quantum):
 
 def calculate_stats(result):
     max_len = 0
-    sum_len=0
+    sum_len = "("
+    for t in result:
+        sum_len += str(len(t)) + " + "
+    sum_len = sum_len[:-3]
+    sum_len += ")"
     stats=[]
     finished_threads = [False for l in result]
 
     for l in result:
-        sum_len += len(l)
         if len(l)>max_len:
             max_len=len(l)
 
-
     stats.append('Throughput=' + str(len(result))+ "/" + str(max_len))
-    stats.append("Turnaround time="+str(sum_len)+ "/" + str(len(result)))
+    stats.append("Turnaround time="+ sum_len + "/" + str(len(result)))
 
 
 
@@ -208,19 +213,31 @@ def calculate_stats(result):
     io_count=0
     wait_count=0
 
+    wait_count_list = []
     for l in result:
         tag = False
+        tag2 = False
         for i in range(1,len(l)):
             if l[i-1]=='x' and l[i]=='-':
                 io_count+=1
-
+                wait_count = 0
+                tag2 = True
 
             if l[i-1]=='-' and l[i]=='.':
                 tag=True
+                tag2=True
                 wait_count+=1
             if l[i-1]=='.' and l[i]=='.' and tag:
                 wait_count+=1
-    stats.append("Waittime=" + str(wait_count) + "/" + str(io_count))
+            elif tag2 and l[i]=='x':
+                tag2 = False
+                wait_count_list.append(wait_count)
+    wait_output = "("
+    for w in wait_count_list:
+        wait_output += str(w) + " + "
+    wait_output = wait_output[:-3]
+    wait_output += ")"
+    stats.append("Waittime=" + wait_output + "/" + str(io_count))
     task_switches=0
 
 
