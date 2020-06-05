@@ -13,14 +13,15 @@ with open('./input_file.txt') as input_file:
         print('Поток ' + str(threads_list.index(thread)) + ': ', thread)
 
 import sheduling_algorithms
-result = sheduling_algorithms.FCFS(threads_list)
+result = sheduling_algorithms.RR_Priority(threads_list,2)
 stats=sheduling_algorithms.calculate_stats(result)
 print(stats)
 
+#smart code below
 lis = []
 lis.append(2)
 lis.append(1)
 print(lis)
 print(lis.pop(0))
-
+#smart code higher
 sheduling_algorithms.visualise(result)
