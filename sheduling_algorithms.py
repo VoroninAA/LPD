@@ -64,11 +64,13 @@ def StandartPriotiry(thread_list):
     cpu = 0
     while not all(finished_threads):
         if queue:
+            step = True
             current_thread_number = min(queue)
             queue.pop(queue.index(current_thread_number))
             print(current_thread_number)
             while (not finished_threads[current_thread_number]) and (
-                    thread_list[current_thread_number][current_indexes[current_thread_number]] == 1):
+                    thread_list[current_thread_number][current_indexes[current_thread_number]] == 1) and step:
+                step = False
                 for i in range(len(result)):
                     if not finished_threads[i]:
                         if i == current_thread_number:
@@ -322,19 +324,19 @@ def calculate_stats(result):
     task_switches=0
 
 
-    prev_thread=0
+    prev_thread = 0
     for k in range(0,len(result)):
-        if result[k][0]=='x':
-            prev_thread=k
+        if result[k][0] == 'x':
+            prev_thread = k
 
     finished_threads = [False for t in result]
     for i in range(0,max_len):
         for k in range(0,len(result)):
-            if  finished_threads[k]==False:
+            if not finished_threads[k]:
                 if result[k][i]=='x':
-                    if prev_thread!=k:
-                        task_switches+=1
-                        prev_thread=k
+                    if prev_thread != k:
+                        task_switches += 1
+                        prev_thread = k
 
 
 
